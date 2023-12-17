@@ -1,0 +1,6 @@
+# id    x   y   data_generated-Mbps  delay_budget-ms   CPU_needed-operations
+1   10  20  10  5   10000
+2   1  30  100  5   10000
+3   10  210  1  5   10000
+4   10  230  10000  5   10
+5   100  120  10  5   10000
