@@ -20,7 +20,7 @@ edgeComputeNode = ComputeNode.ComputeNode("Edge", Params.Edge_CPU_cycles, Params
 cloudComputeNode = ComputeNode.ComputeNode("Cloud", Params.Cloud_CPU_cycles, Params.Cloud_BS_delay)
 
 # Run your BS decision algorithm considering edge, cloud, and IoT properties
-schemes = ["EDGE", "CLOUD", "RANDOM", "MINE"]
+schemes = ["EDGE", "CLOUD", "RANDOM", "DIST"]
 stats = np.zeros((4, len(schemes)))  # 4 for 4 statistics
 for a, allocation_scheme in enumerate(schemes):
     allocation = BS.allocateResources(edgeComputeNode, cloudComputeNode, IoT_devices, allocation_scheme)

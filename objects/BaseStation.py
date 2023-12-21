@@ -45,21 +45,21 @@ class BaseStation:
                 resources_allocated.set_values(run_on_edge, run_on_cloud, uplink_bandwidth, compute_allocated)
                 decision.append(resources_allocated)
 
-        elif scheme == "MINE":
-            max_distance = 200
+        elif scheme == "DIST":
+            max_distance = 180
+            threshold_distance = 121.0
+            _sum = 0
             for IoT in IoTnodes:
-                # Do stuff here
                 distance_to_bs = util.distance_2d(self.x, self.y, IoT.x, IoT.y)
-
+                run_on_edge = 0
+                run_on_cloud = 0
+                _sum += distance_to_bs
                 # Use a threshold distance to decide whether to allocate to edge or cloud
-                threshold_distance = 75.0  # Adjust this threshold as needed
                 if distance_to_bs <= threshold_distance:
                     compute_allocated = min(IoT.CPU_needed, edgeComputeResources.CPU_cycles)
                     run_on_edge = 1
-                    run_on_cloud = 0
                 else:
                     compute_allocated = min(IoT.CPU_needed, cloudComputeResources.CPU_cycles)
-                    run_on_edge = 0
                     run_on_cloud = 1
 
                 # Update remaining capacities
@@ -67,14 +67,14 @@ class BaseStation:
                 remainingCloudCapacity -= compute_allocated * run_on_cloud
 
                 # Allocate uplink bandwidth dependent on distance
-                uplink_bandwidth = self.bandwidth * (max_distance - distance_to_bs) / max_distance / n_nodes
+                uplink_bandwidth = self.bandwidth * (max_distance - distance_to_bs) / (max_distance * n_nodes)
 
                 print(IoT.get_rate(self, uplink_bandwidth))
                 # Create an Allocation object and add it to the decision list
                 resources_allocated = Allocation()
                 resources_allocated.set_values(run_on_edge, run_on_cloud, uplink_bandwidth, compute_allocated)
                 decision.append(resources_allocated)
-
+            print(_sum/n_nodes)
         else:
             for IoT in IoTnodes:
                 uplink_bandwidth = self.bandwidth / n_nodes
