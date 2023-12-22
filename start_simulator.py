@@ -21,12 +21,18 @@ cloudComputeNode = ComputeNode.ComputeNode("Cloud", Params.Cloud_CPU_cycles, Par
 
 # Run your BS decision algorithm considering edge, cloud, and IoT properties
 schemes = ["EDGE", "CLOUD", "RANDOM", "DIST", "SORT"]
-stats = np.zeros((4, len(schemes)))  # 4 for 4 statistics
+stats = np.zeros((5, len(schemes)))  # 4 for 4 statistics
 for a, allocation_scheme in enumerate(schemes):
     allocation = BS.allocateResources(edgeComputeNode, cloudComputeNode, IoT_devices, allocation_scheme)
     # Check if the algorithm's decision is a feasible one (resource limits are not violated)
     # Report the resource utilization: uplink bandwidth, edge and cloud usage
     is_feasible, utilization_uplink, utilization_edge, utilization_cloud = BS.check_if_feasible(allocation, edgeComputeNode.CPU_cycles, cloudComputeNode.CPU_cycles)
+    
+    #calculate the average delay for each IoT node in a scheme
+    averageNodeDelay = 0
+    for node in allocation:
+        averageNodeDelay += node.run_on_cloud
+    averageNodeDelay = averageNodeDelay * cloudComputeNode.delay_from_BS / len(allocation)
 
     if is_feasible:
         print("\nGreat! This is a feasible allocation of resources.\n")
@@ -34,7 +40,7 @@ for a, allocation_scheme in enumerate(schemes):
         print("There seems to be more capacity allocated than the available capacity!")
 
     print("Utilization of Uplink:%.2f \nEdge-Utilization:%.2f \nCloud-Utilization:%.2f" % (utilization_uplink, utilization_edge, utilization_cloud))
-    stats[:, a] = [is_feasible, utilization_uplink, utilization_edge, utilization_cloud]
+    stats[:, a] = [is_feasible, utilization_uplink, utilization_edge, utilization_cloud, averageNodeDelay]
 
 # plot statistics
 # WHAT OTHER STATISTICS can you plot showing the goodness of your solution? You can add new statistics and plots here.
@@ -44,3 +50,5 @@ util.plot_bars(np.arange(len(schemes)), stats[2, :], "output_files/edge_utilizat
                ylab="Edge Compute Utilization", xlabels=schemes, labels=schemes)
 util.plot_bars(np.arange(len(schemes)), stats[3, :], "output_files/cloud_utilization", xlab="Allocation Schemes",
                ylab="Cloud Compute Utilization", xlabels=schemes, labels=schemes)
+util.plot_bars(np.arange(len(schemes)), stats[4, :], "output_files/node_delay", xlab="Allocation Schemes",
+               ylab="Average IoT node dalay", xlabels=schemes, labels=schemes)

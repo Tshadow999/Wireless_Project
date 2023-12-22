@@ -99,10 +99,10 @@ class BaseStation:
 
                 #Distribute computing to all nodes with first come first serve for the edge server as nodes are sorted
                 compute_allocated = IoT.CPU_needed
-                if remainingEdgeCapacity > IoT.CPU_needed:
+                if remainingEdgeCapacity >= IoT.CPU_needed:
                     run_on_edge = 1
                     remainingEdgeCapacity -= compute_allocated
-                elif remainingCloudCapacity > IoT.CPU_needed:
+                elif remainingCloudCapacity >= IoT.CPU_needed:
                     run_on_cloud = 1
                     remainingCloudCapacity -= compute_allocated
                 else:
