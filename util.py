@@ -5,15 +5,9 @@ from objects import Params
 
 mp.use('Agg')
 from matplotlib import pyplot
-# from scipy.stats.kde import gaussian_kde
 import numpy as np
-import scipy
-from matplotlib.ticker import FormatStrFormatter
-
-import matplotlib.pyplot as plt
 
 mp.rcParams["font.family"] = "Verdana"
-
 
 def snr(distance, bandwidth, power, frequency):
     antenna_gain = 0
@@ -132,17 +126,10 @@ def plot_bars(b, A, inpname, x_label_rotation=0, xlab="", ylab="", xlabels="",
         BAR_EDGE_COLORS = [get_color(i) for i in range(len(xlabels))]
     else:
         BAR_EDGE_COLORS = ['black'] * len(xlabels)
-    if PATTERNS:
-        h = pyplot.bar(b, A, align='center', width=0.30, color=[get_color(i) for i in range(len(xlabels))],
-                       edgecolor=BAR_EDGE_COLORS, linewidth=1.0,
-                       alpha=OPACITY,
-                       label=labels, hatch=get_pattern(i))
-    else:
-        h = pyplot.bar(b, A, align='center', width=0.30, color=[get_color(i) for i in range(len(xlabels))],
-                       edgecolor=BAR_EDGE_COLORS, linewidth=1.0,
-                       alpha=OPACITY,
-                       label=labels)  #
-    # pyplot.subplots_adjust(bottom=0.3)
+
+    h = pyplot.bar(b, A, align='center', width=0.30, color=[get_color(i) for i in range(len(xlabels))],
+                   edgecolor=BAR_EDGE_COLORS, linewidth=1.0, alpha=OPACITY, label=labels)
+
     pyplot.ylabel(ylab)
 
     xticks_pos = [0.45 * patch.get_width() + patch.get_xy()[0] for patch in h]
