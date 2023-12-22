@@ -28,19 +28,8 @@ for a, allocation_scheme in enumerate(schemes):
     # Report the resource utilization: uplink bandwidth, edge and cloud usage
     is_feasible, utilization_uplink, utilization_edge, utilization_cloud = BS.check_if_feasible(allocation, edgeComputeNode.CPU_cycles, cloudComputeNode.CPU_cycles)
     
-    #calculate the average delay for each IoT node in a scheme
-    averageNodeDelay = 0
-    nodeComputeUtil = 0
-    nodeCloudUtil = 0
-    for n, node in enumerate(allocation):
-        averageNodeDelay += node.run_on_cloud
-        nodeComputeUtil += min(1, node.compute_allocated/IoT_devices[n].CPU_needed)
-        nodeCloudUtil += min(1, IoT_devices[n].get_rate(BS, node.uplink_bandwidth)/IoT_devices[n].data_generated)
-
-    averageNodeDelay = averageNodeDelay * cloudComputeNode.delay_from_BS / len(allocation)
-    nodeComputeUtil = nodeComputeUtil / len(allocation)
-    nodeCloudUtil = nodeCloudUtil / len(allocation)
-
+    #calculate the average delay, Computation Utilization and Cloud Utilization for each IoT node in a scheme
+    averageNodeDelay, nodeComputeUtil, nodeCloudUtil = BS.check_node_utilization(allocation, edgeComputeNode, cloudComputeNode, IoT_devices)
 
 
     if is_feasible:

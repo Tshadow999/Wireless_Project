@@ -159,6 +159,19 @@ class BaseStation:
                     return True, utilization_uplink, utilization_edge, utilization_cloud
         return False, utilization_uplink, utilization_edge, utilization_cloud
 
+    def check_node_utilization(self, allocation, edgeComputeNode, cloudComputeNode, IoT_devices):
+        averageNodeDelay = 0
+        nodeComputeUtil = 0
+        nodeCloudUtil = 0
+        for n, node in enumerate(allocation):
+            averageNodeDelay += node.run_on_cloud * cloudComputeNode.delay_from_BS + node.run_on_edge * edgeComputeNode.delay_from_BS
+            nodeComputeUtil += min(1, node.compute_allocated/IoT_devices[n].CPU_needed)
+            nodeCloudUtil += min(1, IoT_devices[n].get_rate(self, node.uplink_bandwidth)/IoT_devices[n].data_generated)
+
+        averageNodeDelay = averageNodeDelay / len(allocation)
+        nodeComputeUtil = nodeComputeUtil / len(allocation)
+        nodeCloudUtil = nodeCloudUtil / len(allocation)
+        return averageNodeDelay, nodeComputeUtil, nodeCloudUtil
 
 class Allocation:
     def __init__(self):
