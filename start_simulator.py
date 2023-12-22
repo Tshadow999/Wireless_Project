@@ -13,14 +13,14 @@ BS = BaseStation.BaseStation(1, bandwidth, power, x, y, frequency)
 
 # Generate IoT devices, read from input_files folder the IoT device properties
 n_IoT_devices = Params.n_IoT_devices
-IoT_devices = IoT.read_from_IoT_file(Params.input_folder + "/IoT_" + str(n_IoT_devices) + "_devices.txt")
+IoT_devices = IoT.read_from_IoT_file(Params.input_folder + "/IoT_" + str(n_IoT_devices) + "_devices_changed.txt")
 
 # Generate Edge and Cloud compute nodes according to the parameters in the Params.py file
 edgeComputeNode = ComputeNode.ComputeNode("Edge", Params.Edge_CPU_cycles, Params.Edge_BS_delay)
 cloudComputeNode = ComputeNode.ComputeNode("Cloud", Params.Cloud_CPU_cycles, Params.Cloud_BS_delay)
 
 # Run your BS decision algorithm considering edge, cloud, and IoT properties
-schemes = ["EDGE", "CLOUD", "RANDOM", "DIST"]
+schemes = ["EDGE", "CLOUD", "RANDOM", "DIST", "SORT"]
 stats = np.zeros((4, len(schemes)))  # 4 for 4 statistics
 for a, allocation_scheme in enumerate(schemes):
     allocation = BS.allocateResources(edgeComputeNode, cloudComputeNode, IoT_devices, allocation_scheme)

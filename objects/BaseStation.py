@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 import util
 
@@ -75,6 +76,61 @@ class BaseStation:
                 resources_allocated.set_values(run_on_edge, run_on_cloud, uplink_bandwidth, compute_allocated)
                 decision.append(resources_allocated)
             print(_sum/n_nodes)
+        elif scheme == 'SIZE':
+            for IoT in IoTnodes:
+                run_on_edge = 0
+                run_on_cloud = 0
+                can_run_on_edge = 1
+                can_run_on_cloud = 1
+                if IoT.delay_budget < cloudComputeResources.delay_from_BS:
+                    can_run_on_cloud = 0
+                if IoT.CPU_needed/edgeComputeResources.CPU_cycles > IoT.delay_budget:
+                    can_run_on_edge = 0
+
+                if can_run_on_cloud == 0:
+                    run_on_edge = 1
+                    compute_allocated = edgeComputeResources.CPU_cycles / n_nodes
+                    if compute_allocated > IoT.CPU_needed:  # if allocated resource is larger than needed, set allocation to what is needed
+                        compute_allocated = IoT.CPU_needed
+                else:
+                    run_on_cloud = 1
+                    compute_allocated = cloudComputeResources.CPU_cycles / n_nodes
+                    if compute_allocated > IoT.CPU_needed:  # if allocated resource is larger than needed, set allocation to what is needed
+                        compute_allocated = IoT.CPU_needed
+                uplink_bandwidth = self.bandwidth / n_nodes
+                # Create an Allocation object and add it to the decision list
+                resources_allocated = Allocation()
+                resources_allocated.set_values(run_on_edge, run_on_cloud, uplink_bandwidth, compute_allocated)
+                decision.append(resources_allocated)
+        elif scheme == 'SORT':
+            sortedIoT = sorted(IoTnodes, key=lambda x: x.CPU_needed)
+            sortedIoT.sort(key=lambda x: x.delay_budget)
+            decisionPID = np.empty([0,2])
+            for IoT in sortedIoT:
+                run_on_edge = 0
+                run_on_cloud = 0
+                uplink_bandwidth = self.bandwidth
+                while IoT.get_rate(self,uplink_bandwidth) > IoT.data_generated * 1000000:
+                    #print(max(1, 0.001* (IoT.get_rate(self,uplink_bandwidth) - IoT.data_generated * 1000000)))
+                    rate = max(1, 0.001* (IoT.get_rate(self,uplink_bandwidth) - IoT.data_generated * 1000000))
+                    uplink_bandwidth -= rate
+                uplink_bandwidth += rate
+                compute_allocated = IoT.CPU_needed
+                if remainingEdgeCapacity > IoT.CPU_needed:
+                    run_on_edge = 1
+                    remainingEdgeCapacity -= compute_allocated
+                elif remainingCloudCapacity > IoT.CPU_needed:
+                    run_on_cloud = 1
+                    remainingCloudCapacity -= compute_allocated
+                else:
+                    print("Not enough total computation capacity")
+                
+                resources_allocated = Allocation()
+                resources_allocated.set_values(run_on_edge, run_on_cloud, uplink_bandwidth, compute_allocated)
+                decisionPID = np.append(decisionPID,[[int(IoT.id), resources_allocated]], axis=0)
+
+                #print(str(IoT.id) + " Delay: " + str(IoT.delay_budget) + " CPU: " + str(IoT.CPU_needed) + " Required BW: " + str(IoT.data_generated) + " BW allocated: " + str(int(IoT.get_rate(self,uplink_bandwidth))/1000000) + " Bandwidth: " + str(uplink_bandwidth))
+            decision = decisionPID[decisionPID[:,0].argsort()][:,1]
         else:
             for IoT in IoTnodes:
                 uplink_bandwidth = self.bandwidth / n_nodes
