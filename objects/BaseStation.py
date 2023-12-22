@@ -76,32 +76,7 @@ class BaseStation:
                 resources_allocated.set_values(run_on_edge, run_on_cloud, uplink_bandwidth, compute_allocated)
                 decision.append(resources_allocated)
             print(_sum/n_nodes)
-        elif scheme == 'SIZE':
-            for IoT in IoTnodes:
-                run_on_edge = 0
-                run_on_cloud = 0
-                can_run_on_edge = 1
-                can_run_on_cloud = 1
-                if IoT.delay_budget < cloudComputeResources.delay_from_BS:
-                    can_run_on_cloud = 0
-                if IoT.CPU_needed/edgeComputeResources.CPU_cycles > IoT.delay_budget:
-                    can_run_on_edge = 0
 
-                if can_run_on_cloud == 0:
-                    run_on_edge = 1
-                    compute_allocated = edgeComputeResources.CPU_cycles / n_nodes
-                    if compute_allocated > IoT.CPU_needed:  # if allocated resource is larger than needed, set allocation to what is needed
-                        compute_allocated = IoT.CPU_needed
-                else:
-                    run_on_cloud = 1
-                    compute_allocated = cloudComputeResources.CPU_cycles / n_nodes
-                    if compute_allocated > IoT.CPU_needed:  # if allocated resource is larger than needed, set allocation to what is needed
-                        compute_allocated = IoT.CPU_needed
-                uplink_bandwidth = self.bandwidth / n_nodes
-                # Create an Allocation object and add it to the decision list
-                resources_allocated = Allocation()
-                resources_allocated.set_values(run_on_edge, run_on_cloud, uplink_bandwidth, compute_allocated)
-                decision.append(resources_allocated)
         elif scheme == 'SORT':
             sortedIoT = sorted(IoTnodes, key=lambda x: x.CPU_needed)
             sortedIoT.sort(key=lambda x: x.delay_budget)
