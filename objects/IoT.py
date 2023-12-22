@@ -1,5 +1,5 @@
 import util
-
+from objects import Params, AllocationDecision
 
 class IoT:
     def __init__(self, id: int, x: float, y: float, data_generated: float, delay_budget: float, CPU_needed: int,
@@ -21,6 +21,20 @@ class IoT:
         snr = util.snr(distance, bandwidth, self.power, BS.frequency)
         channel_rate = util.shannon_capacity(snr, bandwidth)
         return channel_rate
+
+    def calculate_qos_metric(self, allocation, base_station):
+        # Calculate latency
+        distance = util.distance_2d(base_station.x, base_station.y, self.x, self.y)
+        latency = distance / Params.LIGHTSPEED
+
+        # Calculate throughput, assumes that uplink_bandwidth is the throughput and in MBs
+        throughput = allocation.uplink_bandwidth
+
+        # print(f"latency: {latency}, throughput: {throughput}")
+
+        # Calculate a QoS metric
+        qos_metric = ((1 / latency) + throughput) / (latency * throughput)
+        return qos_metric
 
 
 def read_from_IoT_file(fname):  # return list of IoT devices
