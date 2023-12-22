@@ -49,7 +49,7 @@ util.plot_bars(np.arange(len(schemes)), stats[2, :], "output_files/edge_utilizat
 util.plot_bars(np.arange(len(schemes)), stats[3, :], "output_files/cloud_utilization", xlab="Allocation Schemes",
                ylab="Cloud Compute Utilization", xlabels=schemes, labels=schemes)
 util.plot_bars(np.arange(len(schemes)), stats[4, :], "output_files/node_delay", xlab="Allocation Schemes",
-               ylab="Average IoT node dalay", xlabels=schemes, labels=schemes)
+               ylab="Average IoT node dalay (s)", xlabels=schemes, labels=schemes)
 util.plot_bars(np.arange(len(schemes)), stats[5, :], "output_files/node_compute_utilization", xlab="Allocation Schemes",
                ylab="Node Compute Utilization", xlabels=schemes, labels=schemes)
 util.plot_bars(np.arange(len(schemes)), stats[6, :], "output_files/node_bandwidth_utilization", xlab="Allocation Schemes",
