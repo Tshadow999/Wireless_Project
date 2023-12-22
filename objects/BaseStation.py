@@ -77,19 +77,27 @@ class BaseStation:
                 decision.append(resources_allocated)
             print(_sum/n_nodes)
 
+        # This scheme sorts the node by delay budget and cpu needed 
+        # to make sure all nodes with tight delay budget constrains
+        # are being assigned to the edge server. The sort on CPU requrement
+        # is be able to assign as many nodes a possible to the edge server
         elif scheme == 'SORT':
-            sortedIoT = sorted(IoTnodes, key=lambda x: x.CPU_needed)
-            sortedIoT.sort(key=lambda x: x.delay_budget)
+            sortedIoT = sorted(IoTnodes, key=lambda x: x.CPU_needed) #Sort on CPU requirment per IoT node
+            sortedIoT.sort(key=lambda x: x.delay_budget) #Sort on delay budget per IoT node
             decisionPID = np.empty([0,2])
             for IoT in sortedIoT:
                 run_on_edge = 0
                 run_on_cloud = 0
+
+                #Lower the bandwidth until the data rate is too low
                 uplink_bandwidth = self.bandwidth
                 while IoT.get_rate(self,uplink_bandwidth) > IoT.data_generated * 1000000:
                     #print(max(1, 0.001* (IoT.get_rate(self,uplink_bandwidth) - IoT.data_generated * 1000000)))
                     rate = max(1, 0.001* (IoT.get_rate(self,uplink_bandwidth) - IoT.data_generated * 1000000))
                     uplink_bandwidth -= rate
                 uplink_bandwidth += rate
+
+                #Distribute computing to all nodes with first come first serve for the edge server as nodes are sorted
                 compute_allocated = IoT.CPU_needed
                 if remainingEdgeCapacity > IoT.CPU_needed:
                     run_on_edge = 1
@@ -102,6 +110,7 @@ class BaseStation:
                 
                 resources_allocated = Allocation()
                 resources_allocated.set_values(run_on_edge, run_on_cloud, uplink_bandwidth, compute_allocated)
+                #Sort on ID to get back to correct order
                 decisionPID = np.append(decisionPID,[[int(IoT.id), resources_allocated]], axis=0)
 
                 #print(str(IoT.id) + " Delay: " + str(IoT.delay_budget) + " CPU: " + str(IoT.CPU_needed) + " Required BW: " + str(IoT.data_generated) + " BW allocated: " + str(int(IoT.get_rate(self,uplink_bandwidth))/1000000) + " Bandwidth: " + str(uplink_bandwidth))
