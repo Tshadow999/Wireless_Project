@@ -23,7 +23,7 @@ cloudComputeNode = ComputeNode.ComputeNode("Cloud", Params.Cloud_CPU_cycles, Par
 # Run your BS decision algorithm considering edge, cloud, and IoT properties
 schemes = ["EDGE", "CLOUD", "RANDOM", "DIST", "SORT"]
 
-stats = np.zeros((4, len(schemes)))  # 4 for 4 statistics
+stats = np.zeros((7, len(schemes)))  # 4 for 4 statistics
 # Initialize an array to store QoS metrics for each scheme
 qos_metrics = np.zeros((len(schemes), len(IoT_devices)))
 for a, allocation_scheme in enumerate(schemes):

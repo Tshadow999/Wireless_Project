@@ -25,13 +25,13 @@ class IoT:
     def calculate_qos_metric(self, allocation, base_station):
         # Calculate latency
         distance = util.distance_2d(base_station.x, base_station.y, self.x, self.y)
-        latency = distance / Params.LIGHTSPEED
+        latency = distance / Params.LIGHTSPEED + allocation.run_on_cloud*5
 
         # Calculate throughput, assumes that uplink_bandwidth is the throughput and in
-        throughput = allocation.uplink_bandwidth / 1_000_000
+        throughput = min(self.get_rate(base_station, allocation.uplink_bandwidth) / 1_000_000, self.data_generated)
 
         # Calculate a QoS metric
-        qos_metric = 1.0 / (latency + throughput)
+        qos_metric = throughput / latency
         return qos_metric
 
 
